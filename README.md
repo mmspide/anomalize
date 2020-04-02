@@ -80,7 +80,6 @@ tidyverse_cran_downloads %>%
     plot_anomalies(time_recomposed = TRUE, ncol = 3, alpha_dots = 0.25) +
     labs(title = "Tidyverse Anomalies", subtitle = "STL + IQR Methods") 
 ```
-
 <img src="man/figures/README-tidyverse_anoms_1-1.png" width="100%" />
 
 Check out the [`anomalize` Quick Start
@@ -154,6 +153,51 @@ tidyverse_cran_downloads %>%
 For more information on the `anomalize` methods and the inner workings,
 please see [“Anomalize Methods”
 Vignette](https://business-science.github.io/anomalize/articles/anomalize_methods.html).
+
+## 5-Minutes To Anomalize
+
+Load libraries.
+
+``` r
+    library(tidyverse)
+    library(tibbletime)
+    library(anomalize)
+```
+    
+Get some data. We’ll use the tidyverse_cran_downloads data set that comes with anomalize. A few points:
+
+It’s a tibbletime object (class tbl_time), which is the object structure that anomalize works with because it’s time aware! Tibbles (class tbl_df) will automatically be converted.
+
+It contains daily download counts on 15 “tidy” packages spanning 2017-01-01 to 2018-03-01. The 15 packages are already grouped for your convenience.
+
+It’s all setup and ready to analyze with anomalize!
+
+``` r
+tidyverse_cran_downloads
+#> # A time tibble: 6,375 x 3
+#> # Index:  date
+#> # Groups: package [15]
+#>    date       count package
+#>    <date>     <dbl> <chr>  
+#>  1 2017-01-01   873 tidyr  
+#>  2 2017-01-02  1840 tidyr  
+#>  3 2017-01-03  2495 tidyr  
+#>  4 2017-01-04  2906 tidyr  
+#>  5 2017-01-05  2847 tidyr  
+#>  6 2017-01-06  2756 tidyr  
+#>  7 2017-01-07  1439 tidyr  
+#>  8 2017-01-08  1556 tidyr  
+#>  9 2017-01-09  3678 tidyr  
+#> 10 2017-01-10  7086 tidyr  
+#> # … with 6,365 more rows
+```
+
+We can use the general workflow for anomaly detection, which involves three main functions:
+
+time_decompose(): Separates the time series into seasonal, trend, and remainder components
+anomalize(): Applies anomaly detection methods to the remainder component.
+time_recompose(): Calculates limits that separate the “normal” data from the anomalies!
+
 
 ## References
 
