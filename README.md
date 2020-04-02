@@ -214,6 +214,15 @@ It’s all setup and ready to analyze with anomalize!
     #> $ recomposed_l1 <dbl> -1456.786, 2199.890, 2752.793, 2717.032, 2520.278,…
     #> $ recomposed_l2 <dbl> 5998.779, 9655.454, 10208.358, 10172.597, 9975.843…
 ```
+Equals:
+``` r
+
+    tt<-time_decompose(data=tidyverse_cran_downloads, count, merge = TRUE)
+    dd<-anomalize(data=tt,remainder)
+    tidyverse_cran_downloads_anomalized <- time_recompose(data=dd)
+    glimpse(tidyverse_cran_downloads_anomalized)
+
+```
 
 We can use the general workflow for anomaly detection, which involves three main functions:
 
@@ -243,7 +252,10 @@ We can then visualize the anomalies using the plot_anomalies() function.
     tidyverse_cran_downloads_anomalized %>%
         plot_anomalies(ncol = 3, alpha_dots = 0.25)
 ```
-
+Equals:
+``` r
+    plot_anomalies(data=tidyverse_cran_downloads_anomalized, ncol = 3, alpha_dots = 0.25)
+```
 ## References
 
 Several other packages were instrumental in developing anomaly detection
