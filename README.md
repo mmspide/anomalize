@@ -173,24 +173,47 @@ It contains daily download counts on 15 “tidy” packages spanning 2017-01-01 
 It’s all setup and ready to analyze with anomalize!
 
 ``` r
-tidyverse_cran_downloads
-#> # A time tibble: 6,375 x 3
-#> # Index:  date
-#> # Groups: package [15]
-#>    date       count package
-#>    <date>     <dbl> <chr>  
-#>  1 2017-01-01   873 tidyr  
-#>  2 2017-01-02  1840 tidyr  
-#>  3 2017-01-03  2495 tidyr  
-#>  4 2017-01-04  2906 tidyr  
-#>  5 2017-01-05  2847 tidyr  
-#>  6 2017-01-06  2756 tidyr  
-#>  7 2017-01-07  1439 tidyr  
-#>  8 2017-01-08  1556 tidyr  
-#>  9 2017-01-09  3678 tidyr  
-#> 10 2017-01-10  7086 tidyr  
-#> # … with 6,365 more rows
-```
+    tidyverse_cran_downloads
+    #> # A time tibble: 6,375 x 3
+    #> # Index:  date
+    #> # Groups: package [15]
+    #>    date       count package
+    #>    <date>     <dbl> <chr>  
+    #>  1 2017-01-01   873 tidyr  
+    #>  2 2017-01-02  1840 tidyr  
+    #>  3 2017-01-03  2495 tidyr  
+    #>  4 2017-01-04  2906 tidyr  
+    #>  5 2017-01-05  2847 tidyr  
+    #>  6 2017-01-06  2756 tidyr  
+    #>  7 2017-01-07  1439 tidyr  
+    #>  8 2017-01-08  1556 tidyr  
+    #>  9 2017-01-09  3678 tidyr  
+    #> 10 2017-01-10  7086 tidyr  
+    #> # … with 6,365 more rows
+    ```
+    ``` r
+    tidyverse_cran_downloads_anomalized <- tidyverse_cran_downloads %>%
+        time_decompose(count, merge = TRUE) %>%
+        anomalize(remainder) %>%
+        time_recompose()
+
+    tidyverse_cran_downloads_anomalized %>% glimpse()
+    #> Observations: 6,375
+    #> Variables: 12
+    #> Groups: package [15]
+    #> $ package       <chr> "tidyr", "tidyr", "tidyr", "tidyr", "tidyr", "tidy…
+    #> $ date          <date> 2017-01-01, 2017-01-02, 2017-01-03, 2017-01-04, 2…
+    #> $ count         <dbl> 873, 1840, 2495, 2906, 2847, 2756, 1439, 1556, 367…
+    #> $ observed      <dbl> 8.730000e+02, 1.840000e+03, 2.495000e+03, 2.906000…
+    #> $ season        <dbl> -2761.4637, 901.0113, 1459.7147, 1429.7532, 1238.7…
+    #> $ trend         <dbl> 5052.582, 5046.782, 5040.983, 5035.183, 5029.383, …
+    #> $ remainder     <dbl> -1418.11842, -4107.79368, -4005.69726, -3558.93599…
+    #> $ remainder_l1  <dbl> -3747.904, -3747.904, -3747.904, -3747.904, -3747.…
+    #> $ remainder_l2  <dbl> 3707.661, 3707.661, 3707.661, 3707.661, 3707.661, …
+    #> $ anomaly       <chr> "No", "Yes", "Yes", "No", "No", "No", "No", "No", …
+    #> $ recomposed_l1 <dbl> -1456.786, 2199.890, 2752.793, 2717.032, 2520.278,…
+    #> $ recomposed_l2 <dbl> 5998.779, 9655.454, 10208.358, 10172.597, 9975.843…
+    ```
 
 We can use the general workflow for anomaly detection, which involves three main functions:
 
@@ -198,6 +221,27 @@ time_decompose(): Separates the time series into seasonal, trend, and remainder 
 anomalize(): Applies anomaly detection methods to the remainder component.
 time_recompose(): Calculates limits that separate the “normal” data from the anomalies!
 
+
+Let’s explain what happened:
+
+time_decompose(count, merge = TRUE): This performs a time series decomposition on the “count” column using seasonal decomposition. It created four columns:
+“observed”: The observed values (actuals)
+“season”: The seasonal or cyclic trend. The default for daily data is a weekly seasonality.
+“trend”: This is the long term trend. The default is a Loess smoother using spans of 3-months for daily data.
+“remainder”: This is what we want to analyze for outliers. It is simply the observed minus both the season and trend.
+Setting merge = TRUE keeps the original data with the newly created columns.
+anomalize(remainder): This performs anomaly detection on the remainder column. It creates three new columns:
+“remainder_l1”: The lower limit of the remainder
+“remainder_l2”: The upper limit of the remainder
+“anomaly”: Yes/No telling us whether or not the observation is an anomaly
+time_recompose(): This recomposes the season, trend and remainder_l1 and remainder_l2 columns into new limits that bound the observed values. The two new columns created are:
+“recomposed_l1”: The lower bound of outliers around the observed value
+“recomposed_l2”: The upper bound of outliers around the observed value
+We can then visualize the anomalies using the plot_anomalies() function.
+    ``` r
+    tidyverse_cran_downloads_anomalized %>%
+        plot_anomalies(ncol = 3, alpha_dots = 0.25)
+    ```
 
 ## References
 
