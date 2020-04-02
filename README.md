@@ -190,8 +190,8 @@ It’s all setup and ready to analyze with anomalize!
     #>  9 2017-01-09  3678 tidyr  
     #> 10 2017-01-10  7086 tidyr  
     #> # … with 6,365 more rows
-    ```
-    ``` r
+```
+``` r
     tidyverse_cran_downloads_anomalized <- tidyverse_cran_downloads %>%
         time_decompose(count, merge = TRUE) %>%
         anomalize(remainder) %>%
@@ -213,7 +213,7 @@ It’s all setup and ready to analyze with anomalize!
     #> $ anomaly       <chr> "No", "Yes", "Yes", "No", "No", "No", "No", "No", …
     #> $ recomposed_l1 <dbl> -1456.786, 2199.890, 2752.793, 2717.032, 2520.278,…
     #> $ recomposed_l2 <dbl> 5998.779, 9655.454, 10208.358, 10172.597, 9975.843…
-    ```
+```
 
 We can use the general workflow for anomaly detection, which involves three main functions:
 
@@ -238,10 +238,11 @@ time_recompose(): This recomposes the season, trend and remainder_l1 and remaind
 “recomposed_l1”: The lower bound of outliers around the observed value
 “recomposed_l2”: The upper bound of outliers around the observed value
 We can then visualize the anomalies using the plot_anomalies() function.
-    ``` r
+
+``` r
     tidyverse_cran_downloads_anomalized %>%
         plot_anomalies(ncol = 3, alpha_dots = 0.25)
-    ```
+```
 
 ## References
 
